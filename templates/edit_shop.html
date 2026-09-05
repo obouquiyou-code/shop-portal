@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier une boutique</title>
+</head>
+<body>
+
+    <h1>Modifier la boutique</h1>
+
+    <p><strong>Nom :</strong> {{ shop["shop_name"] }}</p>
+    <p><strong>Domaine :</strong> {{ shop["domain"] }}</p>
+    <p><strong>Rôle connecté :</strong> {{ role }}</p>
+    {% if role == "shop_config" or role == "super_admin" %}
+
+    <hr>
+
+    <h2>Informations client</h2>
+
+    <p><strong>Nom :</strong> {{ shop["client_name"] }}</p>
+    <p><strong>Sexe :</strong> {{ shop["gender"] }}</p>
+    <p><strong>Email :</strong> {{ shop["client_email"] }}</p>
+    <p><strong>Téléphone :</strong> {{ shop["phone"] }}</p>
+
+    <h2>Informations boutique</h2>
+
+    <p><strong>Boutique :</strong> {{ shop["shop_name"] }}</p>
+    <p><strong>Niche :</strong> {{ shop["niche"] }}</p>
+    <p><strong>Sous-niche :</strong> {{ shop["sub_niche"] }}</p>
+    <p><strong>Langue :</strong> {{ shop["shop_language"] }}</p>
+    <p><strong>Nombre de produits :</strong> {{ shop["product_count"] }}</p>
+    <p><strong>Domaine :</strong> {{ shop["domain"] }}</p>
+    <p><strong>Shopify :</strong> {{ shop["shopify_url"] }}</p>
+
+    <hr>
+
+    {% endif %}
+    
+    {% if role == "reader" %}
+
+        <p>Vous êtes en lecture seule.</p>
+
+        <p><strong>Statut :</strong> {{ shop["status"] }}</p>
+        <p><strong>Paiement :</strong> {{ shop["payment_status"] }}</p>
+        <p><strong>Logo :</strong> {{ shop["logo_status"] }}</p>
+        <p><strong>Lien logo :</strong> {{ shop["logo_url"] or "-" }}</p>
+
+    {% else %}
+
+    <form method="POST">
+
+        {% if role == "super_admin" %}
+
+            <label>État de la demande :</label><br>
+
+            <select name="request_status">
+
+                <option value="Nouvelle demande"
+                    {% if shop["request_status"] == "Nouvelle demande" %}selected{% endif %}>
+                    Nouvelle demande
+                </option>
+
+                <option value="Acceptée"
+                    {% if shop["request_status"] == "Acceptée" %}selected{% endif %}>
+                    Acceptée
+                </option>
+
+                <option value="À compléter"
+                    {% if shop["request_status"] == "À compléter" %}selected{% endif %}>
+                    À compléter
+                </option>
+
+                <option value="Refusée"
+                    {% if shop["request_status"] == "Refusée" %}selected{% endif %}>
+                    Refusée
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <label>Statut configuration :</label><br>
+
+            <select name="config_status">
+
+                <option value="À faire"
+                    {% if shop["config_status"] == "À faire" %}selected{% endif %}>
+                    À faire
+                </option>
+
+                <option value="En cours"
+                    {% if shop["config_status"] == "En cours" %}selected{% endif %}>
+                    En cours
+                </option>
+
+                <option value="Bloquée"
+                    {% if shop["config_status"] == "Bloquée" %}selected{% endif %}>
+                    Bloquée
+                </option>
+
+                <option value="À valider"
+                    {% if shop["config_status"] == "À valider" %}selected{% endif %}>
+                    À valider
+                </option>
+
+                <option value="Terminée"
+                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}>
+                    Terminée
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <label>Validation finale :</label><br>
+
+            <select name="final_status">
+
+                <option value="En attente"
+                    {% if shop["final_status"] == "En attente" %}selected{% endif %}>
+                    En attente
+                </option>
+
+                <option value="À valider"
+                    {% if shop["final_status"] == "À valider" %}selected{% endif %}>
+                    À valider
+                </option>
+
+                <option value="Validée"
+                    {% if shop["final_status"] == "Validée" %}selected{% endif %}>
+                    Validée
+                </option>
+
+                <option value="Refusée"
+                    {% if shop["final_status"] == "Refusée" %}selected{% endif %}>
+                    Refusée
+                </option>
+
+            </select>
+
+        
+            <br><br>
+
+        {% endif %}
+
+
+        {% if role == "super_admin" or role == "payment" %}
+
+            <label>Statut paiement :</label><br>
+
+            <select name="payment_status">
+                <option value="En attente"
+                    {% if shop["payment_status"] == "En attente" %}selected{% endif %}>
+                    En attente
+                </option>
+
+                <option value="Validé"
+                    {% if shop["payment_status"] == "Validé" %}selected{% endif %}>
+                    Validé
+                </option>
+
+                <option value="Refusé"
+                    {% if shop["payment_status"] == "Refusé" %}selected{% endif %}>
+                    Refusé
+                </option>
+            </select>
+
+            <br><br>
+
+        {% endif %}
+
+
+        {% if role == "super_admin" or role == "designer" %}
+
+            <label>Statut logo :</label><br>
+
+            <select name="logo_status">
+                <option value="En attente"
+                    {% if shop["logo_status"] == "En attente" %}selected{% endif %}>
+                    En attente
+                </option>
+
+                <option value="En cours"
+                    {% if shop["logo_status"] == "En cours" %}selected{% endif %}>
+                    En cours
+                </option>
+
+                <option value="Prêt"
+                    {% if shop["logo_status"] == "Prêt" %}selected{% endif %}>
+                    Prêt
+                </option>
+            </select>
+
+            <br><br>
+
+            <label>Lien du logo :</label><br>
+
+            <input
+                type="url"
+                name="logo_url"
+                value="{{ shop['logo_url'] or '' }}"
+            >
+
+            <br><br>
+
+        {% endif %}
+
+        {% if role == "super_admin" or role == "shop_config" %}
+
+            <h2>Configuration de la boutique</h2>
+
+            <label>État de la boutique :</label><br>
+
+            <select name="config_status">
+
+                <option value="Nouvelle demande"
+                    {% if shop["config_status"] == "Nouvelle demande" %}selected{% endif %}>
+                    Nouvelle demande
+                </option>
+
+                <option value="En cours"
+                    {% if shop["config_status"] == "En cours" %}selected{% endif %}>
+                    En cours
+                </option>
+
+                <option value="Problème"
+                    {% if shop["config_status"] == "Problème" %}selected{% endif %}>
+                    Problème
+                </option>
+
+                <option value="À valider"
+                    {% if shop["config_status"] == "À valider" %}selected{% endif %}>
+                    À valider
+                </option>
+
+                <option value="Terminée"
+                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}>
+                    Terminée
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <h3>Problèmes rencontrés</h3>
+
+            <label>
+                <input type="checkbox"
+                    name="issue_domain"
+                    {% if shop["issue_domain"] %}checked{% endif %}>
+                Problème domaine
+            </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox"
+                    name="issue_shopify_access"
+                    {% if shop["issue_shopify_access"] %}checked{% endif %}>
+                Problème accès Shopify
+            </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox"
+                    name="issue_products"
+                    {% if shop["issue_products"] %}checked{% endif %}>
+                Problème produits
+            </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox"
+                    name="issue_theme"
+                    {% if shop["issue_theme"] %}checked{% endif %}>
+                Problème thème
+            </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox"
+                    name="issue_other"
+                    {% if shop["issue_other"] %}checked{% endif %}>
+                Autre problème
+            </label>
+
+            <br><br>
+
+            <label>Commentaire :</label><br>
+
+            <textarea
+                name="issue_comment"
+                rows="5"
+                cols="50"
+                placeholder="Décrivez le problème rencontré..."
+            >{{ shop["issue_comment"] or "" }}</textarea>
+
+            <br><br>
+
+        {% endif %}
+
+        <button type="submit">
+            Enregistrer
+        </button>
+
+    </form>
+
+    {% endif %}
+
+    <br>
+
+    <a href="/shops">Retour à la liste</a>
+
+</body>
+</html>

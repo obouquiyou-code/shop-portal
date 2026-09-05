@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer votre boutique</title>
+</head>
+<body>
+
+    <h1>Demande de création de boutique</h1>
+
+    <form method="POST" action="/create-shop">
+
+        <label>Nom du client :</label><br>
+        <input type="text" name="client_name" required><br><br>
+
+        <label>Email :</label><br>
+        <input type="email" name="client_email" required><br><br>
+
+        <label>Sexe :</label><br>
+        <select name="gender" required>
+            <option value="">Choisir</option>
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+        </select>
+
+        <br><br>
+
+        <label>Numéro de téléphone :</label><br>
+        <input type="tel" name="phone" required>
+
+        <br><br>
+
+        <label>Langue de la boutique :</label><br>
+        <select name="shop_language" required>
+            <option value="">Choisir</option>
+            <option value="fr">Français</option>
+            <option value="en">Anglais</option>
+        </select>
+
+        <br><br>
+
+        <label>Nombre de produits :</label><br>
+        <select name="product_count" required>
+            <option value="">Choisir</option>
+            <option value="20">20 produits</option>
+            <option value="50">50 produits</option>
+        </select>
+
+        <br><br>
+
+        <label>Nom de la boutique :</label><br>
+        <input type="text" name="shop_name" required><br><br>
+
+        <label>Niche :</label><br>
+        <input type="text" name="niche" required><br><br>
+
+        <label>Sous-niche :</label><br>
+        <input type="text" name="sub_niche"><br><br>
+
+        <label>Domaine souhaité :</label><br>
+        <input type="text" name="domain"><br><br>
+
+        <label>Lien Shopify :</label><br>
+        <input type="url" name="shopify_url"><br><br>
+
+        <button type="submit">
+            Envoyer ma demande
+        </button>
+
+    </form>
+
+</body>
+</html>

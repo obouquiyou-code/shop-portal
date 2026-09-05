@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des boutiques</title>
+</head>
+<body>
+
+    <h1>Liste des boutiques</h1>
+
+    <p>
+    Connecté : {{ username }} |
+    Rôle : {{ role }} |
+    <a href="/history">Historique</a> |
+    <a href="/logout">Déconnexion</a>
+    </p>
+
+    <br><br>
+
+    {% if role == "super_admin" %}
+    <a href="/">Créer manuellement une boutique</a>
+    {% endif %}
+
+    <br><br>
+
+    <h2>Tableau de bord</h2>
+
+    <div>
+        <strong>Total boutiques :</strong>
+        {{ total_shops }}
+    </div>
+
+    <div>
+        <strong>Nouvelles demandes :</strong>
+        {{ new_requests }}
+    </div>
+
+    <div>
+        <strong>Paiements en attente :</strong>
+        {{ pending_payments }}
+    </div>
+
+    <div>
+        <strong>Configurations bloquées :</strong>
+        {{ blocked_configs }}
+    </div>
+
+    <div>
+        <strong>Boutiques validées :</strong>
+        {{ validated_shops }}
+    </div>
+
+    <br>
+
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Niche</th>
+                <th>Sous-niche</th>
+                <th>Domaine</th>
+                <th>Lien Shopify</th>
+                <th>Étape actuelle</th>
+                <th>Demande</th>
+                <th>Paiement</th>
+                <th>Logo</th>
+                <th>Configuration</th>
+                <th>Validation finale</th>
+                <th>Lien Logo</th>
+                <th>Créée le</th>
+                <th>Alerte</th>
+                <th>Détail</th>
+                <th>Action</th>
+                
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for shop in shops %}
+            <tr>
+
+                <!-- ID -->
+                <td>{{ shop["id"] }}</td>
+
+                <!-- Nom -->
+                <td>{{ shop["shop_name"] }}</td>
+
+                <!-- Niche -->
+                <td>{{ shop["niche"] }}</td>
+
+                <!-- Sous-niche -->
+                <td>{{ shop["sub_niche"] }}</td>
+
+                <!-- Domaine -->
+                <td>{{ shop["domain"] }}</td>
+
+                <!-- Lien Shopify -->
+                <td>
+                    {% if shop["shopify_url"] %}
+                        <a href="{{ shop['shopify_url'] }}" target="_blank">
+                            Ouvrir
+                        </a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <!-- Étape actuelle -->    
+                <td>
+                    {{ shop["current_step"] }}
+                </td>
+
+                <!-- Demande -->
+                <td>{{ shop["request_status"] }}</td>
+
+                <!-- Paiement -->
+                <td>{{ shop["payment_status"] }}</td>
+
+                <!-- Logo -->
+                <td>{{ shop["logo_status"] }}</td>
+
+                <!-- Configuration -->
+                <td>{{ shop["config_status"] }}</td>
+
+                <!-- Validation finale -->
+                <td>{{ shop["final_status"] }}</td>
+
+                <!-- Lien Logo -->
+                <td>
+                    {% if shop["logo_url"] %}
+                        <a href="{{ shop['logo_url'] }}" target="_blank">
+                            Voir le logo
+                        </a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <!-- Créée le -->
+                <td>{{ shop["created_at"] }}</td>
+
+                <!-- Alerte -->
+                <td>
+                    {% if shop["issue_domain"]
+                    or shop["issue_shopify_access"]
+                    or shop["issue_products"]
+                    or shop["issue_theme"]
+                    or shop["issue_other"] %}
+
+                        ⚠ Problème signalé
+
+                    {% elif shop["config_status"] == "Bloquée" %}
+
+                        ⛔ Configuration bloquée
+
+                    {% elif shop["payment_status"] != "Validé"
+                        and shop["config_status"] == "À faire" %}
+
+                        ⏳ En attente du paiement
+
+                    {% else %}
+
+                        ✅ Aucun blocage
+
+                    {% endif %}
+                </td>
+
+                <!-- Détail -->
+                <td>
+                    <a href="/shop/{{ shop['id'] }}">
+                        Voir
+                    </a>
+                </td>
+
+                <!-- Action -->
+                <td>
+                    {% if role != "reader" %}
+                        <a href="/shop/{{ shop['id'] }}/edit">
+                            Modifier
+                        </a>
+                    {% else %}
+                        Lecture seule
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,294 @@
+from flask import Flask, render_template, request, session, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+
+app.secret_key = "dev-secret-key"
+
+def login_required():
+    if "user_id" not in session:
+        return False
+    return True
+
+def init_db():
+    conn = sqlite3.connect("shops.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS shops (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            shop_name TEXT NOT NULL,
+            niche TEXT NOT NULL,
+            sub_niche TEXT,
+            domain TEXT,
+            shopify_url TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+def migrate_db():
+    conn = sqlite3.connect("shops.db")
+    cursor = conn.cursor()
+
+    columns = {
+        "status": "TEXT DEFAULT 'À créer'",
+        "payment_status": "TEXT DEFAULT 'En attente'",
+        "logo_status": "TEXT DEFAULT 'En attente'",
+        "logo_url": "TEXT",
+        "created_at": "TEXT"
+    }
+
+    cursor.execute("PRAGMA table_info(shops)")
+    existing_columns = [column[1] for column in cursor.fetchall()]
+
+    for column_name, column_type in columns.items():
+        if column_name not in existing_columns:
+            cursor.execute(
+                f"ALTER TABLE shops ADD COLUMN {column_name} {column_type}"
+            )
+
+    cursor.execute("""
+        UPDATE shops
+        SET created_at = datetime('now')
+        WHERE created_at IS NULL
+    """)
+
+    conn.commit()
+    conn.close()
+
+def init_users():
+    conn = sqlite3.connect("shops.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+    """)
+
+    users = [
+        ("admin", "admin123", "super_admin"),
+        ("lise", "lise123", "payment"),
+        ("designer", "designer123", "designer"),
+        ("sav", "sav123", "reader")
+    ]
+
+    for username, password, role in users:
+        cursor.execute("""
+            INSERT OR IGNORE INTO users (
+                username,
+                password,
+                role
+            )
+            VALUES (?, ?, ?)
+        """, (
+            username,
+            password,
+            role
+        ))
+
+    conn.commit()
+    conn.close()
+
+@app.route("/")
+def home():
+    if not login_required():
+        return redirect(url_for("login"))
+
+    return render_template("index.html")
+
+
+@app.route("/create-shop", methods=["POST"])
+def create_shop():
+    shop_name = request.form["shop_name"]
+    niche = request.form["niche"]
+    sub_niche = request.form["sub_niche"]
+    domain = request.form["domain"]
+    shopify_url = request.form["shopify_url"]
+
+    conn = sqlite3.connect("shops.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO shops (
+        shop_name,
+        niche,
+        sub_niche,
+        domain,
+        shopify_url,
+        created_at
+    )
+    VALUES (?, ?, ?, ?, ?, datetime('now'))
+""", (
+    shop_name,
+    niche,
+    sub_niche,
+    domain,
+    shopify_url
+))
+
+    conn.commit()
+    conn.close()
+
+    return """
+        <h1>Boutique enregistrée</h1>
+        <p>La boutique a bien été ajoutée à la base de données.</p>
+        <a href="/">Créer une autre boutique</a>
+    """
+
+@app.route("/shops")
+def shops():
+    if not login_required():
+        return redirect(url_for("login"))
+
+    conn = sqlite3.connect("shops.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM shops ORDER BY id DESC")
+    shops = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+    "shops.html",
+    shops=shops,
+    username=session.get("username"),
+    role=session.get("role")
+)
+
+@app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
+def edit_shop(shop_id):
+    if not login_required():
+        return redirect(url_for("login"))
+
+    role = session.get("role")
+
+    conn = sqlite3.connect("shops.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM shops
+        WHERE id = ?
+    """, (shop_id,))
+
+    shop = cursor.fetchone()
+
+    if not shop:
+        conn.close()
+        return "Boutique introuvable", 404
+
+    if request.method == "POST":
+
+        if role == "super_admin":
+            status = request.form["status"]
+            payment_status = request.form["payment_status"]
+            logo_status = request.form["logo_status"]
+            logo_url = request.form["logo_url"]
+
+            cursor.execute("""
+                UPDATE shops
+                SET status = ?,
+                    payment_status = ?,
+                    logo_status = ?,
+                    logo_url = ?
+                WHERE id = ?
+            """, (
+                status,
+                payment_status,
+                logo_status,
+                logo_url,
+                shop_id
+            ))
+
+        elif role == "payment":
+            payment_status = request.form["payment_status"]
+
+            cursor.execute("""
+                UPDATE shops
+                SET payment_status = ?
+                WHERE id = ?
+            """, (
+                payment_status,
+                shop_id
+            ))
+
+        elif role == "designer":
+            logo_status = request.form["logo_status"]
+            logo_url = request.form["logo_url"]
+
+            cursor.execute("""
+                UPDATE shops
+                SET logo_status = ?,
+                    logo_url = ?
+                WHERE id = ?
+            """, (
+                logo_status,
+                logo_url,
+                shop_id
+            ))
+
+        elif role == "reader":
+            conn.close()
+            return "Accès refusé : lecture seule", 403
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("shops"))
+
+    conn.close()
+
+    return render_template(
+        "edit_shop.html",
+        shop=shop,
+        role=role
+    )
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = sqlite3.connect("shops.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT * FROM users
+            WHERE username = ? AND password = ?
+        """, (username, password))
+
+        user = cursor.fetchone()
+        conn.close()
+
+        if user:
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            session["role"] = user["role"]
+
+            return redirect(url_for("shops"))
+
+        error = "Nom d'utilisateur ou mot de passe incorrect."
+
+    return render_template("login.html", error=error)
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+if __name__ == "__main__":
+    init_db()
+    migrate_db()
+    init_users()
+    app.run(debug=True)
