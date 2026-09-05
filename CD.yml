@@ -1,0 +1,32 @@
+trigger: none
+
+resources:
+  pipelines:
+  - pipeline: shopportalCI
+    source: 'CI - Shop Portal'
+    trigger: true
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: DownloadPipelineArtifact@2
+  displayName: 'Télécharger artefact du CI'
+  inputs:
+    buildType: 'specific'
+    project: '$(System.TeamProjectId)'
+    definition: '$(resources.pipeline.shopportalCI.pipelineID)'
+    buildVersionToDownload: 'specific'
+    pipelineId: '$(resources.pipeline.shopportalCI.runID)'
+    artifactName: 'shopportal'
+    targetPath: '$(Pipeline.Workspace)/shopportal'
+
+- task: AzureWebApp@1
+  displayName: 'Déployer Shop Portal sur Azure'
+  inputs:
+    azureSubscription: 'sc-shopportal-azure'
+    appType: 'webAppLinux'
+    appName: 'shopportal-othmane-2026'
+    package: '$(Pipeline.Workspace)/shopportal/shopportal.zip'
+    startUpCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 app:app'
