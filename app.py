@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import sqlite3
+import os
+import pyodbc
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -134,6 +139,14 @@ def init_users():
 
     conn.commit()
     conn.close()
+
+def get_azure_sql_connection():
+    connection_string = os.getenv("AZURE_SQL_CONNECTION_STRING")
+
+    if not connection_string:
+        raise RuntimeError("AZURE_SQL_CONNECTION_STRING est introuvable.")
+
+    return pyodbc.connect(connection_string)
 
 @app.route("/")
 def home():
@@ -770,6 +783,23 @@ def shop_detail(shop_id):
         history=history,
         role=session.get("role")
     )
+
+@app.route("/test-azure-sql")
+def test_azure_sql():
+    try:
+        conn = get_azure_sql_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT DB_NAME()")
+        database_name = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return f"Connexion Azure SQL réussie ! Base utilisée : {database_name}"
+
+    except Exception as e:
+        return f"Erreur Azure SQL : {str(e)}", 500
 
 if __name__ == "__main__":
     init_db()
