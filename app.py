@@ -229,12 +229,18 @@ def shops():
     if not login_required():
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("shops.db")
-    conn.row_factory = sqlite3.Row
+    conn = get_azure_sql_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM shops ORDER BY id DESC")
-    shops = cursor.fetchall()
+    rows = cursor.fetchall()
+
+    columns = [column[0] for column in cursor.description]
+
+    shops = [
+        dict(zip(columns, row))
+        for row in rows
+    ]
 
     shops_with_step = []
 
@@ -283,18 +289,19 @@ def shops():
         if shop["final_status"] == "Validée"
     )
 
+    cursor.close()
     conn.close()
 
     return render_template(
-    "shops.html",
-    shops=shops_with_step,
-    username=session.get("username"),
-    role=session.get("role"),
-    total_shops=total_shops,
-    new_requests=new_requests,
-    pending_payments=pending_payments,
-    blocked_configs=blocked_configs,
-    validated_shops=validated_shops
+        "shops.html",
+        shops=shops_with_step,
+        username=session.get("username"),
+        role=session.get("role"),
+        total_shops=total_shops,
+        new_requests=new_requests,
+        pending_payments=pending_payments,
+        blocked_configs=blocked_configs,
+        validated_shops=validated_shops
     )
 
 @app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
