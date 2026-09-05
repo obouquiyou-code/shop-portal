@@ -628,22 +628,24 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect("shops.db")
-        conn.row_factory = sqlite3.Row
+        conn = get_azure_sql_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT * FROM users
+            SELECT id, username, password, role
+            FROM users
             WHERE username = ? AND password = ?
         """, (username, password))
 
         user = cursor.fetchone()
+
+        cursor.close()
         conn.close()
 
         if user:
-            session["user_id"] = user["id"]
-            session["username"] = user["username"]
-            session["role"] = user["role"]
+            session["user_id"] = user[0]
+            session["username"] = user[1]
+            session["role"] = user[3]
 
             return redirect(url_for("shops"))
 
