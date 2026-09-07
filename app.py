@@ -165,13 +165,43 @@ def create_shop():
     gender = request.form["gender"]
     phone = request.form["phone"]
     shop_language = request.form["shop_language"]
-    product_count = request.form["product_count"]
+    product_count = int(request.form["product_count"])
 
-    conn = sqlite3.connect("shops.db")
+    conn = get_azure_sql_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO shops (
+        INSERT INTO shops (
+            client_name,
+            client_email,
+            gender,
+            phone,
+            shop_name,
+            niche,
+            sub_niche,
+            domain,
+            shopify_url,
+            shop_language,
+            product_count,
+            status,
+            payment_status,
+            logo_status,
+            created_at,
+            request_status,
+            config_status,
+            final_status
+        )
+        VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            'Nouvelle demande',
+            'En attente',
+            'En attente',
+            GETDATE(),
+            'Nouvelle demande',
+            'À faire',
+            'En attente'
+        )
+    """, (
         client_name,
         client_email,
         gender,
@@ -182,39 +212,12 @@ def create_shop():
         domain,
         shopify_url,
         shop_language,
-        product_count,
-        status,
-        payment_status,
-        logo_status,
-        created_at,
-        request_status,
-        config_status,
-        final_status
-    )
-    VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        'Nouvelle demande',
-        'En attente',
-        'En attente',
-        'À faire',
-        'En attente',
-        datetime('now')
-    )
-    """, (
-    client_name,
-    client_email,
-    gender,
-    phone,
-    shop_name,
-    niche,
-    sub_niche,
-    domain,
-    shopify_url,
-    shop_language,
-    product_count
+        product_count
     ))
 
     conn.commit()
+
+    cursor.close()
     conn.close()
 
     return """
