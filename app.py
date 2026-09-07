@@ -415,13 +415,15 @@ def edit_shop(shop_id):
                     INSERT INTO history (
                         shop_id,
                         username,
+                        role,
                         action,
                         created_at
                     )
-                    VALUES (?, ?, ?, GETDATE())
+                    VALUES (?, ?, ?, ?, GETDATE())
                 """, (
                     shop_id,
                     session.get("username"),
+                    session.get("role"),
                     action_text
                 ))
 
@@ -455,13 +457,15 @@ def edit_shop(shop_id):
                 INSERT INTO history (
                     shop_id,
                     username,
+                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, GETDATE())
+                VALUES (?, ?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
+                session.get("role"),
                 f"Paiement modifié : {shop['payment_status']} → {payment_status}"
             ))
 
@@ -508,13 +512,15 @@ def edit_shop(shop_id):
                 INSERT INTO history (
                     shop_id,
                     username,
+                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, GETDATE())
+                VALUES (?, ?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
+                session.get("role"),
                 f"Logo modifié : {shop['logo_status']} → {logo_status}"
             ))
 
@@ -626,13 +632,15 @@ def edit_shop(shop_id):
                 INSERT INTO history (
                     shop_id,
                     username,
+                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, GETDATE())
+                VALUES (?, ?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
+                session.get("role"),
                 f"Configuration : {shop['config_status']} → {config_status} | Problèmes : {issues_text}"
             ))
 
@@ -705,69 +713,99 @@ def history():
     selected_username = request.args.get("username")
     selected_role = request.args.get("role")
 
-    conn = sqlite3.connect("shops.db")
-    conn.row_factory = sqlite3.Row
+    conn = get_azure_sql_connection()
     cursor = conn.cursor()
 
+    # Liste des boutiques
     cursor.execute("""
         SELECT id, shop_name
         FROM shops
         ORDER BY shop_name
     """)
-    
-    shops = cursor.fetchall()
 
+    rows = cursor.fetchall()
+    columns = [column[0] for column in cursor.description]
+
+    shops = [
+        dict(zip(columns, row))
+        for row in rows
+    ]
+
+    # Liste des utilisateurs présents dans l'historique
     cursor.execute("""
         SELECT DISTINCT username
-        FROM shop_history
+        FROM history
+        WHERE username IS NOT NULL
         ORDER BY username
     """)
 
-    users = cursor.fetchall()
+    rows = cursor.fetchall()
+    columns = [column[0] for column in cursor.description]
 
+    users = [
+        dict(zip(columns, row))
+        for row in rows
+    ]
+
+    # Liste des rôles présents dans l'historique
     cursor.execute("""
         SELECT DISTINCT role
-        FROM shop_history
+        FROM history
         WHERE role IS NOT NULL
         ORDER BY role
     """)
 
-    roles = cursor.fetchall()
+    rows = cursor.fetchall()
+    columns = [column[0] for column in cursor.description]
 
+    roles = [
+        dict(zip(columns, row))
+        for row in rows
+    ]
+
+    # Historique complet
     query = """
         SELECT
-            shop_history.id,
-            shop_history.shop_id,
+            history.id,
+            history.shop_id,
             shops.shop_name,
-            shop_history.username,
-            shop_history.role,
-            shop_history.action,
-            shop_history.created_at
-        FROM shop_history
-        JOIN shops ON shop_history.shop_id = shops.id
+            history.username,
+            history.role,
+            history.action,
+            history.created_at
+        FROM history
+        JOIN shops
+            ON history.shop_id = shops.id
         WHERE 1=1
     """
 
     params = []
 
     if selected_shop_id:
-        query += " AND shop_history.shop_id = ?"
+        query += " AND history.shop_id = ?"
         params.append(selected_shop_id)
 
     if selected_username:
-        query += " AND shop_history.username = ?"
+        query += " AND history.username = ?"
         params.append(selected_username)
 
     if selected_role:
-        query += " AND shop_history.role = ?"
+        query += " AND history.role = ?"
         params.append(selected_role)
 
-    query += " ORDER BY shop_history.id DESC"
+    query += " ORDER BY history.id DESC"
 
     cursor.execute(query, params)
 
-    history = cursor.fetchall()
+    rows = cursor.fetchall()
+    columns = [column[0] for column in cursor.description]
 
+    history = [
+        dict(zip(columns, row))
+        for row in rows
+    ]
+
+    cursor.close()
     conn.close()
 
     return render_template(
