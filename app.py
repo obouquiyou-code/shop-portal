@@ -313,27 +313,34 @@ def edit_shop(shop_id):
         return redirect(url_for("login"))
 
     role = session.get("role")
-    
+
     if role == "reader":
         return "Accès refusé : lecture seule", 403
 
-    conn = sqlite3.connect("shops.db")
-    conn.row_factory = sqlite3.Row
+    conn = get_azure_sql_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT * FROM shops
+        SELECT *
+        FROM shops
         WHERE id = ?
     """, (shop_id,))
 
-    shop = cursor.fetchone()
+    row = cursor.fetchone()
 
-    if not shop:
+    if not row:
+        cursor.close()
         conn.close()
         return "Boutique introuvable", 404
 
+    columns = [column[0] for column in cursor.description]
+    shop = dict(zip(columns, row))
+
     if request.method == "POST":
 
+        # =========================
+        # SUPER ADMIN
+        # =========================
         if role == "super_admin":
             request_status = request.form["request_status"]
             payment_status = request.form["payment_status"]
@@ -341,8 +348,11 @@ def edit_shop(shop_id):
             logo_url = request.form["logo_url"]
             config_status = request.form["config_status"]
             final_status = request.form["final_status"]
-            if final_status == "Validée" and shop["config_status"] != "Terminée":
+
+            if final_status == "Validée" and config_status != "Terminée":
+                cursor.close()
                 conn.close()
+
                 return """
                     <h1>Action impossible</h1>
                     <p>La validation finale ne peut pas être validée tant que la configuration de la boutique n'est pas terminée.</p>
@@ -367,7 +377,7 @@ def edit_shop(shop_id):
                 final_status,
                 shop_id
             ))
-            
+
             changes = []
 
             if shop["request_status"] != request_status:
@@ -386,9 +396,7 @@ def edit_shop(shop_id):
                 )
 
             if shop["logo_url"] != logo_url:
-                changes.append(
-                    "Lien logo modifié"
-                )
+                changes.append("Lien logo modifié")
 
             if shop["config_status"] != config_status:
                 changes.append(
@@ -399,35 +407,39 @@ def edit_shop(shop_id):
                 changes.append(
                     f"Validation finale : {shop['final_status']} → {final_status}"
                 )
-            
+
             if changes:
                 action_text = " | ".join(changes)
 
                 cursor.execute("""
-                    INSERT INTO shop_history (
+                    INSERT INTO history (
                         shop_id,
                         username,
-                        role,
                         action,
                         created_at
                     )
-                    VALUES (?, ?, ?, ?, datetime('now'))
+                    VALUES (?, ?, ?, GETDATE())
                 """, (
                     shop_id,
                     session.get("username"),
-                    session.get("role"),
                     action_text
-                ))    
+                ))
 
+        # =========================
+        # PAYMENT
+        # =========================
         elif role == "payment":
+
             if shop["request_status"] != "Acceptée":
+                cursor.close()
                 conn.close()
+
                 return """
                     <h1>Action impossible</h1>
                     <p>Le paiement ne peut pas être traité tant que la demande n'est pas acceptée par le Super Admin.</p>
                     <a href="/shops">Retour aux boutiques</a>
                 """, 403
-            
+
             payment_status = request.form["payment_status"]
 
             cursor.execute("""
@@ -438,25 +450,30 @@ def edit_shop(shop_id):
                 payment_status,
                 shop_id
             ))
+
             cursor.execute("""
-                INSERT INTO shop_history (
+                INSERT INTO history (
                     shop_id,
                     username,
-                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, ?, datetime('now'))
+                VALUES (?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
-                session.get("role"),
                 f"Paiement modifié : {shop['payment_status']} → {payment_status}"
             ))
 
+        # =========================
+        # DESIGNER
+        # =========================
         elif role == "designer":
+
             if shop["request_status"] != "Acceptée":
+                cursor.close()
                 conn.close()
+
                 return """
                     <h1>Action impossible</h1>
                     <p>Le logo ne peut pas être traité tant que la demande n'est pas acceptée.</p>
@@ -464,13 +481,15 @@ def edit_shop(shop_id):
                 """, 403
 
             if shop["payment_status"] != "Validé":
+                cursor.close()
                 conn.close()
+
                 return """
                     <h1>Action impossible</h1>
                     <p>Le logo ne peut pas être traité tant que le paiement n'est pas validé.</p>
                     <a href="/shops">Retour aux boutiques</a>
                 """, 403
-            
+
             logo_status = request.form["logo_status"]
             logo_url = request.form["logo_url"]
 
@@ -484,28 +503,34 @@ def edit_shop(shop_id):
                 logo_url,
                 shop_id
             ))
+
             cursor.execute("""
-                INSERT INTO shop_history (
+                INSERT INTO history (
                     shop_id,
                     username,
-                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, datetime('now'))
+                VALUES (?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
-                session.get("role"),
                 f"Logo modifié : {shop['logo_status']} → {logo_status}"
             ))
-        
+
+        # =========================
+        # SHOP CONFIG
+        # =========================
         elif role == "shop_config":
+
             config_status = request.form["config_status"]
+
             if config_status == "En cours":
 
                 if shop["request_status"] != "Acceptée":
+                    cursor.close()
                     conn.close()
+
                     return """
                         <h1>Action impossible</h1>
                         <p>La configuration ne peut pas commencer tant que la demande n'est pas acceptée.</p>
@@ -513,7 +538,9 @@ def edit_shop(shop_id):
                     """, 403
 
                 if shop["payment_status"] != "Validé":
+                    cursor.close()
                     conn.close()
+
                     return """
                         <h1>Action impossible</h1>
                         <p>La configuration ne peut pas commencer tant que le paiement n'est pas validé.</p>
@@ -521,28 +548,22 @@ def edit_shop(shop_id):
                     """, 403
 
                 if shop["logo_status"] != "Prêt":
+                    cursor.close()
                     conn.close()
+
                     return """
                         <h1>Action impossible</h1>
                         <p>La configuration ne peut pas commencer tant que le logo n'est pas prêt.</p>
                         <a href="/shops">Retour aux boutiques</a>
                     """, 403
-            
-            if config_status == "En cours" and shop["payment_status"] != "Validé":
-                conn.close()
-                return """
-                    <h1>Action impossible</h1>
-                    <p>La configuration ne peut pas commencer tant que le paiement n'est pas validé.</p>
-                    <a href="/shops">Retour à la liste</a>
-                """, 403
 
             issue_domain = 1 if request.form.get("issue_domain") else 0
             issue_shopify_access = 1 if request.form.get("issue_shopify_access") else 0
             issue_products = 1 if request.form.get("issue_products") else 0
             issue_theme = 1 if request.form.get("issue_theme") else 0
             issue_other = 1 if request.form.get("issue_other") else 0
-            if config_status == "Terminée":
 
+            if config_status == "Terminée":
                 if (
                     issue_domain
                     or issue_shopify_access
@@ -550,12 +571,15 @@ def edit_shop(shop_id):
                     or issue_theme
                     or issue_other
                 ):
+                    cursor.close()
                     conn.close()
+
                     return """
                         <h1>Action impossible</h1>
                         <p>La configuration ne peut pas être terminée tant qu'un problème est encore signalé.</p>
                         <a href="/shops">Retour aux boutiques</a>
                     """, 403
+
             issue_comment = request.form.get("issue_comment", "")
 
             cursor.execute("""
@@ -578,6 +602,7 @@ def edit_shop(shop_id):
                 issue_comment,
                 shop_id
             ))
+
             issues = []
 
             if issue_domain:
@@ -598,30 +623,32 @@ def edit_shop(shop_id):
             issues_text = ", ".join(issues) if issues else "Aucun problème"
 
             cursor.execute("""
-                INSERT INTO shop_history (
+                INSERT INTO history (
                     shop_id,
                     username,
-                    role,
                     action,
                     created_at
                 )
-                VALUES (?, ?, ?, datetime('now'))
+                VALUES (?, ?, ?, GETDATE())
             """, (
                 shop_id,
                 session.get("username"),
-                session.get("role"),
                 f"Configuration : {shop['config_status']} → {config_status} | Problèmes : {issues_text}"
             ))
-        
-        elif role == "reader":
+
+        else:
+            cursor.close()
             conn.close()
-            return "Accès refusé : lecture seule", 403
+            return "Accès refusé", 403
 
         conn.commit()
+
+        cursor.close()
         conn.close()
 
         return redirect(url_for("shops"))
 
+    cursor.close()
     conn.close()
 
     return render_template(
@@ -760,8 +787,7 @@ def shop_detail(shop_id):
     if not login_required():
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("shops.db")
-    conn.row_factory = sqlite3.Row
+    conn = get_azure_sql_connection()
     cursor = conn.cursor()
 
     # Récupérer la boutique
@@ -771,22 +797,33 @@ def shop_detail(shop_id):
         WHERE id = ?
     """, (shop_id,))
 
-    shop = cursor.fetchone()
+    row = cursor.fetchone()
 
-    if not shop:
+    if not row:
+        cursor.close()
         conn.close()
         return "Boutique introuvable", 404
 
-    # Récupérer son historique
+    shop_columns = [column[0] for column in cursor.description]
+    shop = dict(zip(shop_columns, row))
+
+    # Récupérer l'historique de la boutique
     cursor.execute("""
         SELECT *
-        FROM shop_history
+        FROM history
         WHERE shop_id = ?
         ORDER BY id DESC
     """, (shop_id,))
 
-    history = cursor.fetchall()
+    history_rows = cursor.fetchall()
+    history_columns = [column[0] for column in cursor.description]
 
+    history = [
+        dict(zip(history_columns, row))
+        for row in history_rows
+    ]
+
+    cursor.close()
     conn.close()
 
     return render_template(
