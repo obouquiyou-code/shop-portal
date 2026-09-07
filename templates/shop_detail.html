@@ -3,136 +3,374 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Détail boutique</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ shop["shop_name"] }} - Shop Portal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
 
 <body>
 
-    <h1>{{ shop["shop_name"] }}</h1>
+<div class="container">
 
-    <p>
-        <a href="/shops">← Retour aux boutiques</a>
-    </p>
+    <div class="detail-header">
 
-    <hr>
+        <div>
+            <h1>{{ shop["shop_name"] }}</h1>
+            <p class="detail-subtitle">
+                Fiche détaillée de la boutique #{{ shop["id"] }}
+            </p>
+        </div>
 
-    <h2>Informations client</h2>
-
-    <p><strong>Nom :</strong> {{ shop["client_name"] }}</p>
-    <p><strong>Email :</strong> {{ shop["client_email"] }}</p>
-    <p><strong>Téléphone :</strong> {{ shop["phone"] }}</p>
-    <p><strong>Sexe :</strong> {{ shop["gender"] }}</p>
-
-    <hr>
-
-    <h2>Informations boutique</h2>
-
-    <p><strong>Niche :</strong> {{ shop["niche"] }}</p>
-    <p><strong>Sous-niche :</strong> {{ shop["sub_niche"] }}</p>
-    <p><strong>Langue :</strong> {{ shop["shop_language"] }}</p>
-    <p><strong>Nombre de produits :</strong> {{ shop["product_count"] }}</p>
-    <p><strong>Domaine :</strong> {{ shop["domain"] }}</p>
-
-    <p>
-        <strong>Lien Shopify :</strong>
-
-        {% if shop["shopify_url"] %}
-            <a href="{{ shop['shopify_url'] }}" target="_blank">
-                Ouvrir Shopify
+        <div>
+            <a href="/shops" class="btn btn-secondary">
+                ← Retour aux boutiques
             </a>
-        {% else %}
-            -
-        {% endif %}
-    </p>
 
-    <hr>
+            {% if role != "reader" %}
+                <a
+                    href="/shop/{{ shop['id'] }}/edit"
+                    class="btn btn-primary"
+                >
+                    Modifier
+                </a>
+            {% endif %}
+        </div>
 
-    <h2>Workflow</h2>
+    </div>
 
-    <p><strong>Demande :</strong> {{ shop["request_status"] }}</p>
-    <p><strong>Paiement :</strong> {{ shop["payment_status"] }}</p>
-    <p><strong>Logo :</strong> {{ shop["logo_status"] }}</p>
-    <p><strong>Configuration :</strong> {{ shop["config_status"] }}</p>
-    <p><strong>Validation finale :</strong> {{ shop["final_status"] }}</p>
 
-    <p>
-        <strong>Lien logo :</strong>
+    <!-- INFORMATIONS -->
+
+    <div class="detail-grid">
+
+        <div class="detail-card">
+
+            <h2>Informations client</h2>
+
+            <div class="info-list">
+
+                <div class="info-row">
+                    <div class="info-label">Nom</div>
+                    <div class="info-value">
+                        {{ shop["client_name"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">
+                        {{ shop["client_email"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Téléphone</div>
+                    <div class="info-value">
+                        {{ shop["phone"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Sexe</div>
+                    <div class="info-value">
+                        {{ shop["gender"] or "-" }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <h2>Informations boutique</h2>
+
+            <div class="info-list">
+
+                <div class="info-row">
+                    <div class="info-label">Niche</div>
+                    <div class="info-value">
+                        {{ shop["niche"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Sous-niche</div>
+                    <div class="info-value">
+                        {{ shop["sub_niche"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Langue</div>
+                    <div class="info-value">
+                        {{ shop["shop_language"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Nombre de produits</div>
+                    <div class="info-value">
+                        {{ shop["product_count"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Domaine</div>
+                    <div class="info-value">
+                        {{ shop["domain"] or "-" }}
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Shopify</div>
+                    <div class="info-value">
+
+                        {% if shop["shopify_url"] %}
+
+                            <a
+                                href="{{ shop['shopify_url'] }}"
+                                target="_blank"
+                                class="link"
+                            >
+                                Ouvrir Shopify ↗
+                            </a>
+
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORKFLOW -->
+
+    <div class="detail-card detail-full">
+
+        <h2>Workflow</h2>
+
+        <div class="workflow-grid">
+
+            <div class="workflow-item">
+                <span>Demande</span>
+                <strong>
+                    {{ shop["request_status"] }}
+                </strong>
+            </div>
+
+            <div class="workflow-item">
+                <span>Paiement</span>
+                <strong>
+                    {{ shop["payment_status"] }}
+                </strong>
+            </div>
+
+            <div class="workflow-item">
+                <span>Logo</span>
+                <strong>
+                    {{ shop["logo_status"] }}
+                </strong>
+            </div>
+
+            <div class="workflow-item">
+                <span>Configuration</span>
+                <strong>
+                    {{ shop["config_status"] }}
+                </strong>
+            </div>
+
+            <div class="workflow-item">
+                <span>Validation finale</span>
+                <strong>
+                    {{ shop["final_status"] }}
+                </strong>
+            </div>
+
+        </div>
 
         {% if shop["logo_url"] %}
-            <a href="{{ shop['logo_url'] }}" target="_blank">
-                Voir le logo
-            </a>
-        {% else %}
-            -
+
+            <p style="margin: 20px 0 0;">
+
+                <a
+                    href="{{ shop['logo_url'] }}"
+                    target="_blank"
+                    class="link"
+                >
+                    Voir le logo ↗
+                </a>
+
+            </p>
+
         {% endif %}
-    </p>
 
-    <hr>
+    </div>
 
-    <h2>Problèmes signalés</h2>
 
-    <p>
-        <strong>Domaine :</strong>
-        {% if shop["issue_domain"] %}Oui{% else %}Non{% endif %}
-    </p>
+    <!-- PROBLEMES -->
 
-    <p>
-        <strong>Accès Shopify :</strong>
-        {% if shop["issue_shopify_access"] %}Oui{% else %}Non{% endif %}
-    </p>
+    <div class="detail-card detail-full">
 
-    <p>
-        <strong>Produits :</strong>
-        {% if shop["issue_products"] %}Oui{% else %}Non{% endif %}
-    </p>
+        <h2>Problèmes signalés</h2>
 
-    <p>
-        <strong>Thème :</strong>
-        {% if shop["issue_theme"] %}Oui{% else %}Non{% endif %}
-    </p>
+        <div class="issue-grid">
 
-    <p>
-        <strong>Autre :</strong>
-        {% if shop["issue_other"] %}Oui{% else %}Non{% endif %}
-    </p>
+            <div class="issue-item">
 
-    <p>
-        <strong>Commentaire :</strong><br>
-        {{ shop["issue_comment"] or "Aucun commentaire" }}
-    </p>
+                <strong>Domaine</strong>
 
-    <hr>
+                {% if shop["issue_domain"] %}
+                    <span class="issue-yes">⚠ Oui</span>
+                {% else %}
+                    <span class="issue-no">✓ Non</span>
+                {% endif %}
 
-    <h2>Historique de la boutique</h2>
+            </div>
 
-    <table border="1" cellpadding="10">
 
-        <thead>
-            <tr>
-                <th>Utilisateur</th>
-                <th>Rôle</th>
-                <th>Action</th>
-                <th>Date</th>
-            </tr>
-        </thead>
+            <div class="issue-item">
 
-        <tbody>
+                <strong>Accès Shopify</strong>
 
-            {% for item in history %}
+                {% if shop["issue_shopify_access"] %}
+                    <span class="issue-yes">⚠ Oui</span>
+                {% else %}
+                    <span class="issue-no">✓ Non</span>
+                {% endif %}
 
-            <tr>
-                <td>{{ item["username"] }}</td>
-                <td>{{ item["role"] or "-" }}</td>
-                <td>{{ item["action"] }}</td>
-                <td>{{ item["created_at"] }}</td>
-            </tr>
+            </div>
 
-            {% endfor %}
 
-        </tbody>
+            <div class="issue-item">
 
-    </table>
+                <strong>Produits</strong>
+
+                {% if shop["issue_products"] %}
+                    <span class="issue-yes">⚠ Oui</span>
+                {% else %}
+                    <span class="issue-no">✓ Non</span>
+                {% endif %}
+
+            </div>
+
+
+            <div class="issue-item">
+
+                <strong>Thème</strong>
+
+                {% if shop["issue_theme"] %}
+                    <span class="issue-yes">⚠ Oui</span>
+                {% else %}
+                    <span class="issue-no">✓ Non</span>
+                {% endif %}
+
+            </div>
+
+
+            <div class="issue-item">
+
+                <strong>Autre</strong>
+
+                {% if shop["issue_other"] %}
+                    <span class="issue-yes">⚠ Oui</span>
+                {% else %}
+                    <span class="issue-no">✓ Non</span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="issue-comment">
+
+            <strong>Commentaire :</strong><br><br>
+
+            {{ shop["issue_comment"] or "Aucun commentaire" }}
+
+        </div>
+
+    </div>
+
+
+    <!-- HISTORIQUE -->
+
+    <div class="detail-card detail-full">
+
+        <h2>Historique de la boutique</h2>
+
+        {% if history %}
+
+            <div class="table-wrapper">
+
+                <table style="min-width: 800px;">
+
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Rôle</th>
+                            <th>Action</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in history %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ item["username"] }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ item["role"] or "-" }}
+                            </td>
+
+                            <td>
+                                {{ item["action"] }}
+                            </td>
+
+                            <td>
+                                {{ item["created_at"] }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-history">
+                Aucune action enregistrée pour cette boutique.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
 
 </body>
-
 </html>

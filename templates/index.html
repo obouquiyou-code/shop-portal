@@ -1,73 +1,236 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Créer votre boutique</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
-    <h1>Demande de création de boutique</h1>
 
-    <form method="POST" action="/create-shop">
+    <div class="form-page">
 
-        <label>Nom du client :</label><br>
-        <input type="text" name="client_name" required><br><br>
+        <div class="form-container">
 
-        <label>Email :</label><br>
-        <input type="email" name="client_email" required><br><br>
+            <div class="form-header">
+                <h1>Demande de création de boutique</h1>
+                <p>
+                    Renseignez les informations nécessaires pour lancer votre projet.
+                </p>
+            </div>
 
-        <label>Sexe :</label><br>
-        <select name="gender" required>
-            <option value="">Choisir</option>
-            <option value="Homme">Homme</option>
-            <option value="Femme">Femme</option>
-        </select>
+            <div class="form-card">
 
-        <br><br>
+                <form method="POST" action="/create-shop">
 
-        <label>Numéro de téléphone :</label><br>
-        <input type="tel" name="phone" required>
+                    <div class="form-section">
 
-        <br><br>
+                        <h2>Informations client</h2>
 
-        <label>Langue de la boutique :</label><br>
-        <select name="shop_language" required>
-            <option value="">Choisir</option>
-            <option value="fr">Français</option>
-            <option value="en">Anglais</option>
-        </select>
+                        <div class="form-grid">
 
-        <br><br>
+                            <div class="form-group">
+                                <label for="client_name">
+                                    Nom du client
+                                </label>
 
-        <label>Nombre de produits :</label><br>
-        <select name="product_count" required>
-            <option value="">Choisir</option>
-            <option value="20">20 produits</option>
-            <option value="50">50 produits</option>
-        </select>
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="client_name"
+                                    name="client_name"
+                                    required
+                                >
+                            </div>
 
-        <br><br>
+                            <div class="form-group">
+                                <label for="client_email">
+                                    Email
+                                </label>
 
-        <label>Nom de la boutique :</label><br>
-        <input type="text" name="shop_name" required><br><br>
+                                <input
+                                    class="form-control"
+                                    type="email"
+                                    id="client_email"
+                                    name="client_email"
+                                    required
+                                >
+                            </div>
 
-        <label>Niche :</label><br>
-        <input type="text" name="niche" required><br><br>
+                            <div class="form-group">
+                                <label for="gender">
+                                    Sexe
+                                </label>
 
-        <label>Sous-niche :</label><br>
-        <input type="text" name="sub_niche"><br><br>
+                                <select
+                                    class="form-select"
+                                    id="gender"
+                                    name="gender"
+                                    required
+                                >
+                                    <option value="">Choisir</option>
+                                    <option value="Homme">Homme</option>
+                                    <option value="Femme">Femme</option>
+                                </select>
+                            </div>
 
-        <label>Domaine souhaité :</label><br>
-        <input type="text" name="domain"><br><br>
+                            <div class="form-group">
+                                <label for="phone">
+                                    Numéro de téléphone
+                                </label>
 
-        <label>Lien Shopify :</label><br>
-        <input type="url" name="shopify_url"><br><br>
+                                <input
+                                    class="form-control"
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    required
+                                >
+                            </div>
 
-        <button type="submit">
-            Envoyer ma demande
-        </button>
+                        </div>
 
-    </form>
+                    </div>
+
+                    <div class="form-section">
+
+                        <h2>Configuration de la boutique</h2>
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="shop_language">
+                                    Langue de la boutique
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="shop_language"
+                                    name="shop_language"
+                                    required
+                                >
+                                    <option value="">Choisir</option>
+                                    <option value="fr">Français</option>
+                                    <option value="en">Anglais</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product_count">
+                                    Nombre de produits
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="product_count"
+                                    name="product_count"
+                                    required
+                                >
+                                    <option value="">Choisir</option>
+                                    <option value="20">20 produits</option>
+                                    <option value="50">50 produits</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="shop_name">
+                                    Nom de la boutique
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="shop_name"
+                                    name="shop_name"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="niche">
+                                    Niche
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="niche"
+                                    name="niche"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sub_niche">
+                                    Sous-niche
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="sub_niche"
+                                    name="sub_niche"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="domain">
+                                    Domaine souhaité
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    id="domain"
+                                    name="domain"
+                                    placeholder="exemple.com"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="shopify_url">
+                                    Lien Shopify
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="url"
+                                    id="shopify_url"
+                                    name="shopify_url"
+                                    placeholder="https://..."
+                                >
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-submit">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Envoyer ma demande
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
+
 </html>

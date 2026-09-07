@@ -1,319 +1,676 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier une boutique</title>
+
+    <title>Modifier {{ shop["shop_name"] }} - Shop Portal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
 
-    <h1>Modifier la boutique</h1>
+<div class="container">
 
-    <p><strong>Nom :</strong> {{ shop["shop_name"] }}</p>
-    <p><strong>Domaine :</strong> {{ shop["domain"] }}</p>
-    <p><strong>Rôle connecté :</strong> {{ role }}</p>
+    <div class="edit-header">
+
+        <div>
+            <h1>Modifier la boutique</h1>
+
+            <div class="edit-meta">
+                <span>
+                    Boutique :
+                    <strong>{{ shop["shop_name"] }}</strong>
+                </span>
+
+                <span>
+                    Domaine :
+                    <strong>{{ shop["domain"] or "-" }}</strong>
+                </span>
+
+                <span class="role-badge">
+                    {{ role }}
+                </span>
+            </div>
+        </div>
+
+        <a
+            href="/shop/{{ shop['id'] }}"
+            class="btn btn-secondary"
+        >
+            ← Retour au détail
+        </a>
+
+    </div>
+
+
     {% if role == "shop_config" or role == "super_admin" %}
 
-    <hr>
+        <div class="detail-grid">
 
-    <h2>Informations client</h2>
+            <div class="edit-card readonly-card">
 
-    <p><strong>Nom :</strong> {{ shop["client_name"] }}</p>
-    <p><strong>Sexe :</strong> {{ shop["gender"] }}</p>
-    <p><strong>Email :</strong> {{ shop["client_email"] }}</p>
-    <p><strong>Téléphone :</strong> {{ shop["phone"] }}</p>
+                <h2>Informations client</h2>
 
-    <h2>Informations boutique</h2>
+                <div class="info-list">
 
-    <p><strong>Boutique :</strong> {{ shop["shop_name"] }}</p>
-    <p><strong>Niche :</strong> {{ shop["niche"] }}</p>
-    <p><strong>Sous-niche :</strong> {{ shop["sub_niche"] }}</p>
-    <p><strong>Langue :</strong> {{ shop["shop_language"] }}</p>
-    <p><strong>Nombre de produits :</strong> {{ shop["product_count"] }}</p>
-    <p><strong>Domaine :</strong> {{ shop["domain"] }}</p>
-    <p><strong>Shopify :</strong> {{ shop["shopify_url"] }}</p>
+                    <div class="info-row">
+                        <div class="info-label">Nom</div>
+                        <div class="info-value">
+                            {{ shop["client_name"] or "-" }}
+                        </div>
+                    </div>
 
-    <hr>
+                    <div class="info-row">
+                        <div class="info-label">Sexe</div>
+                        <div class="info-value">
+                            {{ shop["gender"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">
+                            {{ shop["client_email"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Téléphone</div>
+                        <div class="info-value">
+                            {{ shop["phone"] or "-" }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="edit-card readonly-card">
+
+                <h2>Informations boutique</h2>
+
+                <div class="info-list">
+
+                    <div class="info-row">
+                        <div class="info-label">Boutique</div>
+                        <div class="info-value">
+                            {{ shop["shop_name"] }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Niche</div>
+                        <div class="info-value">
+                            {{ shop["niche"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Sous-niche</div>
+                        <div class="info-value">
+                            {{ shop["sub_niche"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Langue</div>
+                        <div class="info-value">
+                            {{ shop["shop_language"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Produits</div>
+                        <div class="info-value">
+                            {{ shop["product_count"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Domaine</div>
+                        <div class="info-value">
+                            {{ shop["domain"] or "-" }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">Shopify</div>
+                        <div class="info-value">
+
+                            {% if shop["shopify_url"] %}
+                                <a
+                                    href="{{ shop['shopify_url'] }}"
+                                    target="_blank"
+                                    class="link"
+                                >
+                                    Ouvrir Shopify ↗
+                                </a>
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     {% endif %}
-    
+
+
     {% if role == "reader" %}
 
-        <p>Vous êtes en lecture seule.</p>
+        <div class="edit-card">
 
-        <p><strong>Statut :</strong> {{ shop["status"] }}</p>
-        <p><strong>Paiement :</strong> {{ shop["payment_status"] }}</p>
-        <p><strong>Logo :</strong> {{ shop["logo_status"] }}</p>
-        <p><strong>Lien logo :</strong> {{ shop["logo_url"] or "-" }}</p>
+            <h2>Lecture seule</h2>
+
+            <p class="readonly">
+                Vous n'avez pas l'autorisation de modifier cette boutique.
+            </p>
+
+            <div class="workflow-grid">
+
+                <div class="workflow-item">
+                    <span>Statut</span>
+                    <strong>{{ shop["status"] }}</strong>
+                </div>
+
+                <div class="workflow-item">
+                    <span>Paiement</span>
+                    <strong>{{ shop["payment_status"] }}</strong>
+                </div>
+
+                <div class="workflow-item">
+                    <span>Logo</span>
+                    <strong>{{ shop["logo_status"] }}</strong>
+                </div>
+
+                <div class="workflow-item">
+                    <span>Lien logo</span>
+
+                    {% if shop["logo_url"] %}
+                        <a
+                            href="{{ shop['logo_url'] }}"
+                            target="_blank"
+                            class="link"
+                        >
+                            Voir
+                        </a>
+                    {% else %}
+                        <strong>-</strong>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
 
     {% else %}
 
-    <form method="POST">
+        <form method="POST">
+
+
+            {% if role == "super_admin" %}
+
+                <div class="edit-card">
+
+                    <h2>Administration générale</h2>
 
-        {% if role == "super_admin" %}
+                    <div class="edit-grid">
 
-            <label>État de la demande :</label><br>
+                        <div class="form-group">
 
-            <select name="request_status">
+                            <label for="request_status">
+                                État de la demande
+                            </label>
 
-                <option value="Nouvelle demande"
-                    {% if shop["request_status"] == "Nouvelle demande" %}selected{% endif %}>
-                    Nouvelle demande
-                </option>
+                            <select
+                                class="form-select"
+                                id="request_status"
+                                name="request_status"
+                            >
+
+                                <option
+                                    value="Nouvelle demande"
+                                    {% if shop["request_status"] == "Nouvelle demande" %}selected{% endif %}
+                                >
+                                    Nouvelle demande
+                                </option>
+
+                                <option
+                                    value="Acceptée"
+                                    {% if shop["request_status"] == "Acceptée" %}selected{% endif %}
+                                >
+                                    Acceptée
+                                </option>
+
+                                <option
+                                    value="À compléter"
+                                    {% if shop["request_status"] == "À compléter" %}selected{% endif %}
+                                >
+                                    À compléter
+                                </option>
+
+                                <option
+                                    value="Refusée"
+                                    {% if shop["request_status"] == "Refusée" %}selected{% endif %}
+                                >
+                                    Refusée
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="admin_config_status">
+                                Statut configuration
+                            </label>
 
-                <option value="Acceptée"
-                    {% if shop["request_status"] == "Acceptée" %}selected{% endif %}>
-                    Acceptée
-                </option>
+                            <select
+                                class="form-select"
+                                id="admin_config_status"
+                                name="config_status"
+                            >
 
-                <option value="À compléter"
-                    {% if shop["request_status"] == "À compléter" %}selected{% endif %}>
-                    À compléter
-                </option>
+                                <option
+                                    value="À faire"
+                                    {% if shop["config_status"] == "À faire" %}selected{% endif %}
+                                >
+                                    À faire
+                                </option>
 
-                <option value="Refusée"
-                    {% if shop["request_status"] == "Refusée" %}selected{% endif %}>
-                    Refusée
-                </option>
+                                <option
+                                    value="En cours"
+                                    {% if shop["config_status"] == "En cours" %}selected{% endif %}
+                                >
+                                    En cours
+                                </option>
 
-            </select>
+                                <option
+                                    value="Bloquée"
+                                    {% if shop["config_status"] == "Bloquée" %}selected{% endif %}
+                                >
+                                    Bloquée
+                                </option>
 
-            <br><br>
+                                <option
+                                    value="À valider"
+                                    {% if shop["config_status"] == "À valider" %}selected{% endif %}
+                                >
+                                    À valider
+                                </option>
+
+                                <option
+                                    value="Terminée"
+                                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}
+                                >
+                                    Terminée
+                                </option>
 
-            <label>Statut configuration :</label><br>
+                            </select>
 
-            <select name="config_status">
+                        </div>
 
-                <option value="À faire"
-                    {% if shop["config_status"] == "À faire" %}selected{% endif %}>
-                    À faire
-                </option>
 
-                <option value="En cours"
-                    {% if shop["config_status"] == "En cours" %}selected{% endif %}>
-                    En cours
-                </option>
+                        <div class="form-group">
 
-                <option value="Bloquée"
-                    {% if shop["config_status"] == "Bloquée" %}selected{% endif %}>
-                    Bloquée
-                </option>
+                            <label for="final_status">
+                                Validation finale
+                            </label>
 
-                <option value="À valider"
-                    {% if shop["config_status"] == "À valider" %}selected{% endif %}>
-                    À valider
-                </option>
+                            <select
+                                class="form-select"
+                                id="final_status"
+                                name="final_status"
+                            >
 
-                <option value="Terminée"
-                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}>
-                    Terminée
-                </option>
+                                <option
+                                    value="En attente"
+                                    {% if shop["final_status"] == "En attente" %}selected{% endif %}
+                                >
+                                    En attente
+                                </option>
 
-            </select>
+                                <option
+                                    value="À valider"
+                                    {% if shop["final_status"] == "À valider" %}selected{% endif %}
+                                >
+                                    À valider
+                                </option>
 
-            <br><br>
+                                <option
+                                    value="Validée"
+                                    {% if shop["final_status"] == "Validée" %}selected{% endif %}
+                                >
+                                    Validée
+                                </option>
 
-            <label>Validation finale :</label><br>
+                                <option
+                                    value="Refusée"
+                                    {% if shop["final_status"] == "Refusée" %}selected{% endif %}
+                                >
+                                    Refusée
+                                </option>
 
-            <select name="final_status">
+                            </select>
 
-                <option value="En attente"
-                    {% if shop["final_status"] == "En attente" %}selected{% endif %}>
-                    En attente
-                </option>
+                        </div>
 
-                <option value="À valider"
-                    {% if shop["final_status"] == "À valider" %}selected{% endif %}>
-                    À valider
-                </option>
+                    </div>
 
-                <option value="Validée"
-                    {% if shop["final_status"] == "Validée" %}selected{% endif %}>
-                    Validée
-                </option>
+                </div>
 
-                <option value="Refusée"
-                    {% if shop["final_status"] == "Refusée" %}selected{% endif %}>
-                    Refusée
-                </option>
+            {% endif %}
 
-            </select>
 
-        
-            <br><br>
+            {% if role == "super_admin" or role == "payment" %}
 
-        {% endif %}
+                <div class="edit-card">
 
+                    <h2>Paiement</h2>
 
-        {% if role == "super_admin" or role == "payment" %}
+                    <div class="form-group">
 
-            <label>Statut paiement :</label><br>
+                        <label for="payment_status">
+                            Statut paiement
+                        </label>
 
-            <select name="payment_status">
-                <option value="En attente"
-                    {% if shop["payment_status"] == "En attente" %}selected{% endif %}>
-                    En attente
-                </option>
+                        <select
+                            class="form-select"
+                            id="payment_status"
+                            name="payment_status"
+                        >
 
-                <option value="Validé"
-                    {% if shop["payment_status"] == "Validé" %}selected{% endif %}>
-                    Validé
-                </option>
+                            <option
+                                value="En attente"
+                                {% if shop["payment_status"] == "En attente" %}selected{% endif %}
+                            >
+                                En attente
+                            </option>
 
-                <option value="Refusé"
-                    {% if shop["payment_status"] == "Refusé" %}selected{% endif %}>
-                    Refusé
-                </option>
-            </select>
+                            <option
+                                value="Validé"
+                                {% if shop["payment_status"] == "Validé" %}selected{% endif %}
+                            >
+                                Validé
+                            </option>
 
-            <br><br>
+                            <option
+                                value="Refusé"
+                                {% if shop["payment_status"] == "Refusé" %}selected{% endif %}
+                            >
+                                Refusé
+                            </option>
 
-        {% endif %}
+                        </select>
 
+                    </div>
 
-        {% if role == "super_admin" or role == "designer" %}
+                </div>
 
-            <label>Statut logo :</label><br>
+            {% endif %}
 
-            <select name="logo_status">
-                <option value="En attente"
-                    {% if shop["logo_status"] == "En attente" %}selected{% endif %}>
-                    En attente
-                </option>
 
-                <option value="En cours"
-                    {% if shop["logo_status"] == "En cours" %}selected{% endif %}>
-                    En cours
-                </option>
+            {% if role == "super_admin" or role == "designer" %}
 
-                <option value="Prêt"
-                    {% if shop["logo_status"] == "Prêt" %}selected{% endif %}>
-                    Prêt
-                </option>
-            </select>
+                <div class="edit-card">
 
-            <br><br>
+                    <h2>Logo</h2>
 
-            <label>Lien du logo :</label><br>
+                    <div class="edit-grid">
 
-            <input
-                type="url"
-                name="logo_url"
-                value="{{ shop['logo_url'] or '' }}"
-            >
+                        <div class="form-group">
 
-            <br><br>
+                            <label for="logo_status">
+                                Statut logo
+                            </label>
 
-        {% endif %}
+                            <select
+                                class="form-select"
+                                id="logo_status"
+                                name="logo_status"
+                            >
 
-        {% if role == "super_admin" or role == "shop_config" %}
+                                <option
+                                    value="En attente"
+                                    {% if shop["logo_status"] == "En attente" %}selected{% endif %}
+                                >
+                                    En attente
+                                </option>
 
-            <h2>Configuration de la boutique</h2>
+                                <option
+                                    value="En cours"
+                                    {% if shop["logo_status"] == "En cours" %}selected{% endif %}
+                                >
+                                    En cours
+                                </option>
 
-            <label>État de la boutique :</label><br>
+                                <option
+                                    value="Prêt"
+                                    {% if shop["logo_status"] == "Prêt" %}selected{% endif %}
+                                >
+                                    Prêt
+                                </option>
 
-            <select name="config_status">
+                            </select>
 
-                <option value="Nouvelle demande"
-                    {% if shop["config_status"] == "Nouvelle demande" %}selected{% endif %}>
-                    Nouvelle demande
-                </option>
+                        </div>
 
-                <option value="En cours"
-                    {% if shop["config_status"] == "En cours" %}selected{% endif %}>
-                    En cours
-                </option>
 
-                <option value="Problème"
-                    {% if shop["config_status"] == "Problème" %}selected{% endif %}>
-                    Problème
-                </option>
+                        <div class="form-group">
 
-                <option value="À valider"
-                    {% if shop["config_status"] == "À valider" %}selected{% endif %}>
-                    À valider
-                </option>
+                            <label for="logo_url">
+                                Lien du logo
+                            </label>
 
-                <option value="Terminée"
-                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}>
-                    Terminée
-                </option>
+                            <input
+                                class="form-control"
+                                type="url"
+                                id="logo_url"
+                                name="logo_url"
+                                value="{{ shop['logo_url'] or '' }}"
+                                placeholder="https://..."
+                            >
 
-            </select>
+                        </div>
 
-            <br><br>
+                    </div>
 
-            <h3>Problèmes rencontrés</h3>
+                </div>
 
-            <label>
-                <input type="checkbox"
-                    name="issue_domain"
-                    {% if shop["issue_domain"] %}checked{% endif %}>
-                Problème domaine
-            </label>
+            {% endif %}
 
-            <br>
 
-            <label>
-                <input type="checkbox"
-                    name="issue_shopify_access"
-                    {% if shop["issue_shopify_access"] %}checked{% endif %}>
-                Problème accès Shopify
-            </label>
+            {% if role == "super_admin" or role == "shop_config" %}
 
-            <br>
+                <div class="edit-card">
 
-            <label>
-                <input type="checkbox"
-                    name="issue_products"
-                    {% if shop["issue_products"] %}checked{% endif %}>
-                Problème produits
-            </label>
+                    <h2>Configuration de la boutique</h2>
 
-            <br>
+                    {% if role == "shop_config" %}
 
-            <label>
-                <input type="checkbox"
-                    name="issue_theme"
-                    {% if shop["issue_theme"] %}checked{% endif %}>
-                Problème thème
-            </label>
+                        <div class="form-group">
 
-            <br>
+                            <label for="config_status">
+                                État de la boutique
+                            </label>
 
-            <label>
-                <input type="checkbox"
-                    name="issue_other"
-                    {% if shop["issue_other"] %}checked{% endif %}>
-                Autre problème
-            </label>
+                            <select
+                                class="form-select"
+                                id="config_status"
+                                name="config_status"
+                            >
 
-            <br><br>
+                                <option
+                                    value="Nouvelle demande"
+                                    {% if shop["config_status"] == "Nouvelle demande" %}selected{% endif %}
+                                >
+                                    Nouvelle demande
+                                </option>
 
-            <label>Commentaire :</label><br>
+                                <option
+                                    value="En cours"
+                                    {% if shop["config_status"] == "En cours" %}selected{% endif %}
+                                >
+                                    En cours
+                                </option>
 
-            <textarea
-                name="issue_comment"
-                rows="5"
-                cols="50"
-                placeholder="Décrivez le problème rencontré..."
-            >{{ shop["issue_comment"] or "" }}</textarea>
+                                <option
+                                    value="Problème"
+                                    {% if shop["config_status"] == "Problème" %}selected{% endif %}
+                                >
+                                    Problème
+                                </option>
 
-            <br><br>
+                                <option
+                                    value="À valider"
+                                    {% if shop["config_status"] == "À valider" %}selected{% endif %}
+                                >
+                                    À valider
+                                </option>
 
-        {% endif %}
+                                <option
+                                    value="Terminée"
+                                    {% if shop["config_status"] == "Terminée" %}selected{% endif %}
+                                >
+                                    Terminée
+                                </option>
 
-        <button type="submit">
-            Enregistrer
-        </button>
+                            </select>
 
-    </form>
+                        </div>
+
+                    {% endif %}
+
+
+                    <h3>Problèmes rencontrés</h3>
+
+                    <div class="checkbox-grid">
+
+                        <label class="checkbox-item">
+
+                            <input
+                                type="checkbox"
+                                name="issue_domain"
+                                {% if shop["issue_domain"] %}checked{% endif %}
+                            >
+
+                            Problème domaine
+
+                        </label>
+
+
+                        <label class="checkbox-item">
+
+                            <input
+                                type="checkbox"
+                                name="issue_shopify_access"
+                                {% if shop["issue_shopify_access"] %}checked{% endif %}
+                            >
+
+                            Problème accès Shopify
+
+                        </label>
+
+
+                        <label class="checkbox-item">
+
+                            <input
+                                type="checkbox"
+                                name="issue_products"
+                                {% if shop["issue_products"] %}checked{% endif %}
+                            >
+
+                            Problème produits
+
+                        </label>
+
+
+                        <label class="checkbox-item">
+
+                            <input
+                                type="checkbox"
+                                name="issue_theme"
+                                {% if shop["issue_theme"] %}checked{% endif %}
+                            >
+
+                            Problème thème
+
+                        </label>
+
+
+                        <label class="checkbox-item">
+
+                            <input
+                                type="checkbox"
+                                name="issue_other"
+                                {% if shop["issue_other"] %}checked{% endif %}
+                            >
+
+                            Autre problème
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-group" style="margin-top: 20px;">
+
+                        <label for="issue_comment">
+                            Commentaire
+                        </label>
+
+                        <textarea
+                            class="form-textarea"
+                            id="issue_comment"
+                            name="issue_comment"
+                            placeholder="Décrivez le problème rencontré..."
+                        >{{ shop["issue_comment"] or "" }}</textarea>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="edit-actions">
+
+                <a
+                    href="/shops"
+                    class="btn btn-secondary"
+                >
+                    Retour à la liste
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Enregistrer les modifications
+                </button>
+
+            </div>
+
+        </form>
 
     {% endif %}
 
-    <br>
-
-    <a href="/shops">Retour à la liste</a>
+</div>
 
 </body>
 </html>

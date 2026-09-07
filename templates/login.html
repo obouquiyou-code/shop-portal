@@ -1,35 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Connexion - Shop Portal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
 
-    <h1>Connexion</h1>
+    <div class="login-page">
 
-    {% if error %}
-        <p>{{ error }}</p>
-    {% endif %}
+        <div class="login-container">
 
-    <form method="POST">
+            <div class="login-header">
+                <h1>Shop Portal</h1>
+                <p>Connectez-vous à votre espace de gestion</p>
+            </div>
 
-        <label>Utilisateur :</label><br>
-        <input type="text" name="username" required>
+            <div class="login-card">
 
-        <br><br>
+                {% if error %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endif %}
 
-        <label>Mot de passe :</label><br>
-        <input type="password" name="password" required>
+                <form method="POST">
 
-        <br><br>
+                    <div class="form-group">
+                        <label for="username">
+                            Utilisateur
+                        </label>
 
-        <button type="submit">
-            Se connecter
-        </button>
+                        <input
+                            class="form-control"
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Votre nom d'utilisateur"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
 
-    </form>
+                    <div class="form-group">
+                        <label for="password">
+                            Mot de passe
+                        </label>
+
+                        <input
+                            class="form-control"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Votre mot de passe"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <button
+                        class="btn btn-primary login-button"
+                        type="submit"
+                    >
+                        Se connecter
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
 </html>

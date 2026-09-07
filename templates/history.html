@@ -3,116 +3,237 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Historique</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Historique - Shop Portal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
 
 <body>
 
-    <h1>Historique des modifications</h1>
+<div class="container">
 
-    <form method="GET" action="/history">
+    <div class="history-header">
 
-        <label>Filtrer par boutique :</label>
+        <div>
+            <h1>Historique des modifications</h1>
+        </div>
 
-        <select name="shop_id">
+        <a href="/shops" class="btn btn-secondary">
+            ← Retour aux boutiques
+        </a>
 
-            <option value="">Toutes les boutiques</option>
+    </div>
 
-            {% for shop in shops %}
 
-                <option value="{{ shop['id'] }}"
-                    {% if selected_shop_id == shop['id']|string %}
-                        selected
-                    {% endif %}
-                >
-                    {{ shop["shop_name"] }}
-                </option>
+    <div class="filter-card">
 
-            {% endfor %}
+        <form method="GET" action="/history">
 
-        </select>
+            <div class="filter-grid">
 
-        <label>Utilisateur :</label>
+                <div class="filter-group">
 
-        <select name="username">
+                    <label for="shop_id">
+                        Boutique
+                    </label>
 
-            <option value="">Tous les utilisateurs</option>
+                    <select
+                        class="form-select"
+                        id="shop_id"
+                        name="shop_id"
+                    >
 
-            {% for user in users %}
+                        <option value="">
+                            Toutes les boutiques
+                        </option>
 
-                <option value="{{ user['username'] }}"
-                    {% if selected_username == user['username'] %}
-                        selected
-                    {% endif %}
-                >
-                    {{ user["username"] }}
-                </option>
+                        {% for shop in shops %}
 
-            {% endfor %}
+                            <option
+                                value="{{ shop['id'] }}"
+                                {% if selected_shop_id == shop['id']|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ shop["shop_name"] }}
+                            </option>
 
-        </select>
+                        {% endfor %}
 
-        <label>Rôle :</label>
+                    </select>
 
-        <select name="role">
+                </div>
 
-            <option value="">Tous les rôles</option>
 
-            {% for role in roles %}
+                <div class="filter-group">
 
-                <option value="{{ role['role'] }}"
-                    {% if selected_role == role['role'] %}
-                        selected
-                    {% endif %}
-                >
-                    {{ role["role"] }}
-                </option>
+                    <label for="username">
+                        Utilisateur
+                    </label>
 
-            {% endfor %}
+                    <select
+                        class="form-select"
+                        id="username"
+                        name="username"
+                    >
 
-        </select>
+                        <option value="">
+                            Tous les utilisateurs
+                        </option>
 
-        <button type="submit">
-            Filtrer
-        </button>
+                        {% for user in users %}
 
-    </form>
+                            <option
+                                value="{{ user['username'] }}"
+                                {% if selected_username == user['username'] %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ user["username"] }}
+                            </option>
 
-    <br>
+                        {% endfor %}
 
-    <p>
-        <a href="/shops">← Retour aux boutiques</a>
-    </p>
+                    </select>
 
-    <table border="1" cellpadding="10">
+                </div>
 
-        <thead>
-            <tr>
-                <th>Boutique</th>
-                <th>Rôle</th>
-                <th>Utilisateur</th>
-                <th>Action</th>
-                <th>Date</th>
-            </tr>
-        </thead>
 
-        <tbody>
+                <div class="filter-group">
 
-            {% for item in history %}
+                    <label for="role">
+                        Rôle
+                    </label>
 
-            <tr>
-                <td>{{ item["shop_name"] }}</td>
-                <td>{{ item["role"] }}</td>
-                <td>{{ item["username"] }}</td>
-                <td>{{ item["action"] }}</td>
-                <td>{{ item["created_at"] }}</td>
-            </tr>
+                    <select
+                        class="form-select"
+                        id="role"
+                        name="role"
+                    >
 
-            {% endfor %}
+                        <option value="">
+                            Tous les rôles
+                        </option>
 
-        </tbody>
+                        {% for role in roles %}
 
-    </table>
+                            <option
+                                value="{{ role['role'] }}"
+                                {% if selected_role == role['role'] %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ role["role"] }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Filtrer
+                    </button>
+
+                    <a
+                        href="/history"
+                        class="btn btn-secondary"
+                    >
+                        Réinitialiser
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <div class="history-card">
+
+        {% if history %}
+
+            <div class="table-wrapper">
+
+                <table style="min-width: 900px;">
+
+                    <thead>
+
+                        <tr>
+                            <th>Boutique</th>
+                            <th>Rôle</th>
+                            <th>Utilisateur</th>
+                            <th>Action</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in history %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        {{ item["shop_name"] }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="role-badge">
+                                        {{ item["role"] or "-" }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ item["username"] or "-" }}
+                                </td>
+
+                                <td>
+                                    {{ item["action"] }}
+                                </td>
+
+                                <td>
+                                    {{ item["created_at"] }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="history-empty">
+                Aucun historique trouvé avec ces filtres.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
 
 </body>
 </html>
