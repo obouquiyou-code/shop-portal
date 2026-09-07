@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-import sqlite3
 import os
 import pyodbc
 from dotenv import load_dotenv
@@ -15,130 +14,7 @@ def login_required():
         return False
     return True
 
-def init_db():
-    conn = sqlite3.connect("shops.db")
-    cursor = conn.cursor()
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS shops (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            shop_name TEXT NOT NULL,
-            niche TEXT NOT NULL,
-            sub_niche TEXT,
-            domain TEXT,
-            shopify_url TEXT
-        )
-    """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS shop_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            shop_id INTEGER NOT NULL,
-            username TEXT NOT NULL,
-            action TEXT NOT NULL,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (shop_id) REFERENCES shops(id)
-        )
-    """)
-
-    conn.commit()
-    conn.close()
-
-def migrate_db():
-    conn = sqlite3.connect("shops.db")
-    cursor = conn.cursor()
-
-    columns = {
-    "status": "TEXT DEFAULT 'Nouvelle demande'",
-    "payment_status": "TEXT DEFAULT 'En attente'",
-    "logo_status": "TEXT DEFAULT 'En attente'",
-    "logo_url": "TEXT",
-    "created_at": "TEXT",
-    "client_name": "TEXT",
-    "client_email": "TEXT",
-    "gender": "TEXT",
-    "phone": "TEXT",
-    "shop_language": "TEXT",
-    "product_count": "INTEGER",
-    "issue_domain": "INTEGER DEFAULT 0",
-    "issue_shopify_access": "INTEGER DEFAULT 0",
-    "issue_products": "INTEGER DEFAULT 0",
-    "issue_theme": "INTEGER DEFAULT 0",
-    "issue_other": "INTEGER DEFAULT 0",
-    "issue_comment": "TEXT",
-    "request_status": "TEXT DEFAULT 'Nouvelle demande'",
-    "config_status": "TEXT DEFAULT 'À faire'",
-    "final_status": "TEXT DEFAULT 'En attente'"
-
-    }
-
-    conn = sqlite3.connect("shops.db")
-    cursor = conn.cursor()
-
-    cursor.execute("PRAGMA table_info(shop_history)")
-    history_columns = [column[1] for column in cursor.fetchall()]
-
-    if "role" not in history_columns:
-        cursor.execute("""
-            ALTER TABLE shop_history
-            ADD COLUMN role TEXT
-        """)
-
-
-    cursor.execute("PRAGMA table_info(shops)")
-    existing_columns = [column[1] for column in cursor.fetchall()]
-
-    for column_name, column_type in columns.items():
-        if column_name not in existing_columns:
-            cursor.execute(
-                f"ALTER TABLE shops ADD COLUMN {column_name} {column_type}"
-            )
-
-    cursor.execute("""
-        UPDATE shops
-        SET created_at = datetime('now')
-        WHERE created_at IS NULL
-    """)
-
-    conn.commit()
-    conn.close()
-
-def init_users():
-    conn = sqlite3.connect("shops.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            role TEXT NOT NULL
-        )
-    """)
-
-    users = [
-        ("admin", "admin123", "super_admin"),
-        ("lise", "lise123", "payment"),
-        ("designer", "designer123", "designer"),
-        ("sav", "sav123", "reader"),
-        ("config", "config123", "shop_config")
-    ]
-
-    for username, password, role in users:
-        cursor.execute("""
-            INSERT OR IGNORE INTO users (
-                username,
-                password,
-                role
-            )
-            VALUES (?, ?, ?)
-        """, (
-            username,
-            password,
-            role
-        ))
-
-    conn.commit()
-    conn.close()
 
 def get_azure_sql_connection():
     connection_string = os.getenv("AZURE_SQL_CONNECTION_STRING")
@@ -889,7 +765,4 @@ def test_azure_sql():
         return f"Erreur Azure SQL : {str(e)}", 500
 
 if __name__ == "__main__":
-    init_db()
-    migrate_db()
-    init_users()
     app.run(debug=True)
