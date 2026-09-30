@@ -541,12 +541,35 @@ def edit_shop(shop_id):
         role=role
     )
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/select-role")
+def select_role():
+    return render_template("select_role.html")
+
+
+@app.route("/login")
 def login():
+    return redirect(url_for("select_role"))
+
+
+@app.route("/login/<role>", methods=["GET", "POST"])
+def login_role(role):
+
+    allowed_roles = {
+        "super_admin": "admin",
+        "payment": "lise",
+        "designer": "designer",
+        "shop_config": "config",
+        "reader": "sav"
+    }
+
+    if role not in allowed_roles:
+        return redirect(url_for("select_role"))
+
+    username = allowed_roles[role]
     error = None
 
     if request.method == "POST":
-        username = request.form["username"]
+
         password = request.form["password"]
 
         conn = get_azure_sql_connection()
@@ -555,8 +578,14 @@ def login():
         cursor.execute("""
             SELECT id, username, password, role
             FROM users
-            WHERE username = ? AND password = ?
-        """, (username, password))
+            WHERE username = ?
+              AND password = ?
+              AND role = ?
+        """, (
+            username,
+            password,
+            role
+        ))
 
         user = cursor.fetchone()
 
@@ -570,9 +599,14 @@ def login():
 
             return redirect(url_for("shops"))
 
-        error = "Nom d'utilisateur ou mot de passe incorrect."
+        error = "Mot de passe incorrect."
 
-    return render_template("login.html", error=error)
+    return render_template(
+        "login.html",
+        error=error,
+        role=role,
+        username=username
+    )
 
 @app.route("/logout")
 def logout():

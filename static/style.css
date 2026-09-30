@@ -801,3 +801,81 @@ tbody tr:hover {
         flex-direction: column;
     }
 }
+
+/* =========================
+   SELECTION DU ROLE
+   ========================= */
+
+.role-page {
+    max-width: 950px;
+    margin: 60px auto;
+}
+
+.role-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.role-header h1 {
+    margin-bottom: 10px;
+    font-size: 34px;
+    color: #111827;
+}
+
+.role-header p {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.role-card {
+    display: block;
+    padding: 30px;
+    background: white;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #111827;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    border: 2px solid transparent;
+    transition: 0.2s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-3px);
+    border-color: #2563eb;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+}
+
+.role-icon {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.role-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.role-card p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.role-card:last-child {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+    .role-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-card:last-child {
+        grid-column: auto;
+    }
+}

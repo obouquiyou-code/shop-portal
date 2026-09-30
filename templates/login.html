@@ -15,71 +15,71 @@
 
 <body>
 
-    <div class="login-page">
+<div class="login-container">
 
-        <div class="login-container">
+    <div class="login-card">
 
-            <div class="login-header">
-                <h1>Shop Portal</h1>
-                <p>Connectez-vous à votre espace de gestion</p>
-            </div>
+        <h1>Connexion</h1>
 
-            <div class="login-card">
-
-                {% if error %}
-                    <div class="error-message">
-                        {{ error }}
-                    </div>
+        <p>
+            Espace :
+            <strong>
+                {% if role == "super_admin" %}
+                    Super Admin
+                {% elif role == "payment" %}
+                    Paiement
+                {% elif role == "designer" %}
+                    Designer
+                {% elif role == "shop_config" %}
+                    Configuration
+                {% elif role == "reader" %}
+                    SAV
                 {% endif %}
+            </strong>
+        </p>
 
-                <form method="POST">
+        {% if error %}
+            <div class="alert alert-error">
+                {{ error }}
+            </div>
+        {% endif %}
 
-                    <div class="form-group">
-                        <label for="username">
-                            Utilisateur
-                        </label>
+        <form method="POST">
 
-                        <input
-                            class="form-control"
-                            type="text"
-                            id="username"
-                            name="username"
-                            placeholder="Votre nom d'utilisateur"
-                            autocomplete="username"
-                            required
-                        >
-                    </div>
+            <div class="form-group">
 
-                    <div class="form-group">
-                        <label for="password">
-                            Mot de passe
-                        </label>
+                <label for="password">
+                    Mot de passe
+                </label>
 
-                        <input
-                            class="form-control"
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Votre mot de passe"
-                            autocomplete="current-password"
-                            required
-                        >
-                    </div>
-
-                    <button
-                        class="btn btn-primary login-button"
-                        type="submit"
-                    >
-                        Se connecter
-                    </button>
-
-                </form>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    autofocus
+                >
 
             </div>
 
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Se connecter
+            </button>
+
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="/select-role">
+                ← Choisir un autre rôle
+            </a>
         </div>
 
     </div>
+
+</div>
 
 </body>
 </html>

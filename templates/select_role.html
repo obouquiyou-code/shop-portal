@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choisir votre espace - Shop Portal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="role-page">
+
+        <div class="role-header">
+            <h1>Shop Portal</h1>
+            <p>Choisissez votre espace pour continuer</p>
+        </div>
+
+        <div class="role-grid">
+
+            <a href="/login/super_admin" class="role-card">
+                <div class="role-icon">👑</div>
+                <h2>Super Admin</h2>
+                <p>Administration générale</p>
+            </a>
+
+            <a href="/login/payment" class="role-card">
+                <div class="role-icon">💳</div>
+                <h2>Paiement</h2>
+                <p>Gestion des paiements</p>
+            </a>
+
+            <a href="/login/designer" class="role-card">
+                <div class="role-icon">🎨</div>
+                <h2>Designer</h2>
+                <p>Gestion des logos</p>
+            </a>
+
+            <a href="/login/shop_config" class="role-card">
+                <div class="role-icon">⚙️</div>
+                <h2>Configuration</h2>
+                <p>Configuration des boutiques</p>
+            </a>
+
+            <a href="/login/reader" class="role-card">
+                <div class="role-icon">👁️</div>
+                <h2>SAV</h2>
+                <p>Consultation des boutiques</p>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
