@@ -4,3 +4,21 @@ __pycache__/
 .env
 .vscode/
 shops.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Secrets Terraform
+*.tfvars
+!terraform.tfvars.example
+
+# Backups contenant des secrets
+webapp-appsettings-backup.json
+
+webapp-config-backup.json
+
+webapp-container-backup.json

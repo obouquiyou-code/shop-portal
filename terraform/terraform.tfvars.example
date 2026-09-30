@@ -1,0 +1,10 @@
+resource_group_name   = "your-resource-group"
+location              = "France Central"
+
+app_service_plan_name = "your-app-service-plan"
+webapp_name           = "your-webapp"
+
+sql_server_name       = "your-sql-server"
+sql_database_name     = "your-database"
+
+sql_admin_login       = "your-sql-admin"
