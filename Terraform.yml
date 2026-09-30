@@ -1,0 +1,62 @@
+trigger: none
+
+parameters:
+- name: terraformAction
+  displayName: "Commande Terraform"
+  type: string
+  default: apply
+  values:
+  - apply
+  - destroy
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: shopportal-terraform-secrets
+
+- name: terraformWorkingDirectory
+  value: '$(System.DefaultWorkingDirectory)/terraform'
+
+steps:
+- checkout: self
+
+- script: |
+    terraform --version
+  displayName: 'Check Terraform version'
+
+- task: AzureCLI@2
+  displayName: 'Terraform Init'
+  inputs:
+    azureSubscription: 'sc-shopportal-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: '$(terraformWorkingDirectory)'
+    inlineScript: |
+      terraform init
+  env:
+    TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
+
+- task: AzureCLI@2
+  displayName: 'Terraform Plan'
+  inputs:
+    azureSubscription: 'sc-shopportal-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: '$(terraformWorkingDirectory)'
+    inlineScript: |
+      terraform plan
+  env:
+    TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
+
+- task: AzureCLI@2
+  displayName: 'Terraform ${{ parameters.terraformAction }}'
+  inputs:
+    azureSubscription: 'sc-shopportal-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: '$(terraformWorkingDirectory)'
+    inlineScript: |
+      terraform ${{ parameters.terraformAction }} -auto-approve
+  env:
+    TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
