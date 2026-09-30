@@ -22,8 +22,12 @@ steps:
 - checkout: self
 
 - script: |
+    wget -q https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip
+    unzip -o terraform_1.13.3_linux_amd64.zip
+    sudo mv terraform /usr/local/bin/
     terraform --version
-  displayName: 'Check Terraform version'
+  displayName: 'Installer Terraform'
+
 
 - task: AzureCLI@2
   displayName: 'Terraform Init'
