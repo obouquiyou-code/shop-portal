@@ -53,6 +53,13 @@ steps:
     inlineScript: |
       /usr/local/bin/terraform-bin plan
   env:
+    TF_VAR_resource_group_name: $(TF_VAR_resource_group_name)
+    TF_VAR_location: $(TF_VAR_location)
+    TF_VAR_app_service_plan_name: $(TF_VAR_app_service_plan_name)
+    TF_VAR_webapp_name: $(TF_VAR_webapp_name)
+    TF_VAR_sql_server_name: $(TF_VAR_sql_server_name)
+    TF_VAR_sql_database_name: $(TF_VAR_sql_database_name)
+    TF_VAR_sql_admin_login: $(TF_VAR_sql_admin_login)
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
 
 
@@ -66,4 +73,11 @@ steps:
     inlineScript: |
       /usr/local/bin/terraform-bin ${{ parameters.terraformAction }} -auto-approve
   env:
+    TF_VAR_resource_group_name: $(TF_VAR_resource_group_name)
+    TF_VAR_location: $(TF_VAR_location)
+    TF_VAR_app_service_plan_name: $(TF_VAR_app_service_plan_name)
+    TF_VAR_webapp_name: $(TF_VAR_webapp_name)
+    TF_VAR_sql_server_name: $(TF_VAR_sql_server_name)
+    TF_VAR_sql_database_name: $(TF_VAR_sql_database_name)
+    TF_VAR_sql_admin_login: $(TF_VAR_sql_admin_login)
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
