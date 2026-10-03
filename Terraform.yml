@@ -53,6 +53,7 @@ steps:
   env:
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
 
+
 - task: AzureCLI@2
   displayName: 'Terraform ${{ parameters.terraformAction }}'
   inputs:
