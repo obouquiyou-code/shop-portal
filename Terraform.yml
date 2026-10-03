@@ -22,9 +22,11 @@ steps:
 - checkout: self
 
 - script: |
-    wget -q https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip
-    unzip -o terraform_1.13.3_linux_amd64.zip
-    sudo install -m 0755 terraform /usr/local/bin/terraform-bin
+    wget -q -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip
+    rm -rf /tmp/terraform-install
+    mkdir -p /tmp/terraform-install
+    unzip -o /tmp/terraform.zip -d /tmp/terraform-install
+    sudo install -m 0755 /tmp/terraform-install/terraform /usr/local/bin/terraform-bin
     /usr/local/bin/terraform-bin --version
   displayName: 'Installer Terraform'
 
