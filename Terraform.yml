@@ -24,8 +24,8 @@ steps:
 - script: |
     wget -q https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip
     unzip -o terraform_1.13.3_linux_amd64.zip
-    sudo mv terraform /usr/local/bin/
-    terraform --version
+    sudo install -m 0755 terraform /usr/local/bin/terraform-bin
+    /usr/local/bin/terraform-bin --version
   displayName: 'Installer Terraform'
 
 
@@ -37,7 +37,7 @@ steps:
     scriptLocation: 'inlineScript'
     workingDirectory: '$(terraformWorkingDirectory)'
     inlineScript: |
-      terraform init
+      /usr/local/bin/terraform-bin init
   env:
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
 
@@ -49,7 +49,7 @@ steps:
     scriptLocation: 'inlineScript'
     workingDirectory: '$(terraformWorkingDirectory)'
     inlineScript: |
-      terraform plan
+      /usr/local/bin/terraform-bin plan
   env:
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
 
@@ -62,6 +62,6 @@ steps:
     scriptLocation: 'inlineScript'
     workingDirectory: '$(terraformWorkingDirectory)'
     inlineScript: |
-      terraform ${{ parameters.terraformAction }} -auto-approve
+      /usr/local/bin/terraform-bin ${{ parameters.terraformAction }} -auto-approve
   env:
     TF_VAR_sql_admin_password: $(TF_VAR_sql_admin_password)
